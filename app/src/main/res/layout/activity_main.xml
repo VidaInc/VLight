@@ -1,0 +1,71 @@
+<LinearLayout
+    android:id="@+id/root_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".frontend.activities.MainActivity"
+    tools:ignore="MergeRootFrame">
+
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/toolbar"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#22000000"
+            android:minHeight="56dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="VidaLights"
+                android:textColor="#0000ff"
+                android:textSize="20sp"/>
+        </RelativeLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:id="@+id/ll_beacons_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:background="#ffffff"
+                android:visibility="visible">
+
+                <ProgressBar
+                    android:id="@+id/pb_beacons"
+                    style="@android:style/Widget.Holo.ProgressBar.Large"
+                    android:layout_width="28dip"
+                    android:layout_height="28dip"
+                    android:layout_centerHorizontal="true"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/pb_beacons"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="loading..."/>
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/lv"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff">
+            </ListView>
+        </FrameLayout>
+
+    </FrameLayout>
+</LinearLayout>
