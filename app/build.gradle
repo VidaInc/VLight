@@ -22,5 +22,5 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.2.0'
-    compile files('libs/ab-sdk-beta1.5.4.jar')
+    compile project(':android-beacon-library-2.3.3')
 }

@@ -22,12 +22,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".frontend.activities.DetailActivity"/>
-
         <service
-            android:name="net.vidainc.vidahome.service.BeaconService"
-            android:enabled="true"
-            android:exported="true">
+            android:name="net.vidainc.vidahome.service.BeaconService">
         </service>
     </application>
 
