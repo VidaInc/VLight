@@ -2,6 +2,8 @@ package net.vidainc.vidahome;
 
 import android.app.Application;
 
+import net.vidainc.vidahome.service.BeaconService;
+
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Region;
@@ -22,10 +24,9 @@ public class VidaHome extends Application implements BootstrapNotifier {
         BeaconManager beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers()
                 .add(new BeaconParser().
-                        setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
+                        setBeaconLayout(getString(R.string.ibeacon_layout)));
         // wake up the app when any beacon is seen (you can specify specific id filers in the parameters below)
-        Region region = new Region("myBoostrapRegion", null, null, null);
-        regionBootstrap = new RegionBootstrap(this, region);
+        regionBootstrap = new RegionBootstrap(this, BeaconService.ALL_BEACONS_REGION);
         backgroundPowerSaver = new BackgroundPowerSaver(this);
     }
 

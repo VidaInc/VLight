@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/VidaHome.iml" filepath="$PROJECT_DIR$/VidaHome.iml" />
-      <module fileurl="file://$PROJECT_DIR$/android-beacon-library-2.3.3/android-beacon-library-2.3.3.iml" filepath="$PROJECT_DIR$/android-beacon-library-2.3.3/android-beacon-library-2.3.3.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

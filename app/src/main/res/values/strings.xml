@@ -5,5 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="ok">OK</string>
+    <string name="ibeacon_layout">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
 
 </resources>
