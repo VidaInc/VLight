@@ -45,6 +45,7 @@ public class BeaconService extends Service implements BeaconConsumer {
         beaconManager.bind(this);
         //beaconManager.setDebug(true);
         mHandler = new Handler();
+        mBeacons = new HashSet<>();
         Intent regIntent = new Intent(this, GcmIntentService.class);
         regIntent.setAction(Constants.ACTION_REGISTER);
         startService(regIntent);
