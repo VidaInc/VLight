@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.0 rc2"
 
     defaultConfig {
-        applicationId "net.vidainc.vidahomeservice"
+        applicationId "net.vidainc.vidahome"
         minSdkVersion 18
         targetSdkVersion 22
         versionCode 1
@@ -17,14 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    repositories {
-        jcenter()
-    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'org.altbeacon:android-beacon-library:2.3.3'
+    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'de.greenrobot:eventbus:2.2.0'
 }

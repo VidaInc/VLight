@@ -7,7 +7,10 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.widget.Toast;
 
+import net.vidainc.vidahome.Constants;
 import net.vidainc.vidahome.R;
+import net.vidainc.vidahome.models.BeaconData;
+import net.vidainc.vidahome.utils.TimedBeaconSimulator;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -16,14 +19,17 @@ import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONException;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 
 public class BeaconService extends Service implements BeaconConsumer {
     public static final Region ALL_BEACONS_REGION = new Region("apr", null,
             null, null);
     private BeaconManager beaconManager;
+    private HashSet<Beacon> mBeacons;
     private Handler mHandler;
 
     public BeaconService() {
@@ -33,19 +39,15 @@ public class BeaconService extends Service implements BeaconConsumer {
     public void onCreate() {
         super.onCreate();
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
-//        beaconManager.getBeaconParsers()
-//                .add(new BeaconParser().
-//                        setBeaconLayout("m:2-3=0216,i:4-19,i:20-21,i:22-23,p:24-24"));
-//        beaconManager.getBeaconParsers()
-//                .add(new BeaconParser().
-//                        setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"));
-//        beaconManager.getBeaconParsers().add(new BeaconParser().
-//                setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24"));
+        BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
         beaconManager.getBeaconParsers().add(new BeaconParser().
                 setBeaconLayout(getString(R.string.ibeacon_layout)));
         beaconManager.bind(this);
-        beaconManager.setDebug(true);
+        //beaconManager.setDebug(true);
         mHandler = new Handler();
+        Intent regIntent = new Intent(this, GcmIntentService.class);
+        regIntent.setAction(Constants.ACTION_REGISTER);
+        startService(regIntent);
     }
 
     @Override
@@ -55,8 +57,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
     @Override
     public void onBeaconServiceConnect() {
-        Toast.makeText(BeaconService.this, "Beacon service connected: bluetooth? " +
-                beaconManager.checkAvailability(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(BeaconService.this, "Beacon service connected", Toast.LENGTH_SHORT).show();
         beaconManager.setMonitorNotifier(new MonitorNotifier() {
             @Override
             public void didEnterRegion(Region region) {
@@ -92,10 +93,21 @@ public class BeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(final Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     //beacons.iterator().next().getDistance()
+                    mBeacons.addAll(beacons);
+                    Intent msgIntent = new Intent(BeaconService.this, GcmIntentService.class);
+                    msgIntent.setAction(Constants.ACTION_BEACON_DATA);
+                    try {
+                        msgIntent.putExtra(Constants.KEY_MESSAGE_TXT,
+                                BeaconData.toJsonString(BeaconData.fromBeacons(beacons)));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    startService(msgIntent);
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(BeaconService.this, beacons.size() + " beacons found", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(BeaconService.this, beacons.size() + " beacons found",
+                                    Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
