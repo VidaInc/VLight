@@ -10,7 +10,6 @@ import android.widget.Toast;
 import net.vidainc.vidahome.Constants;
 import net.vidainc.vidahome.R;
 import net.vidainc.vidahome.models.BeaconData;
-import net.vidainc.vidahome.utils.TimedBeaconSimulator;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -39,7 +38,7 @@ public class BeaconService extends Service implements BeaconConsumer {
     public void onCreate() {
         super.onCreate();
         beaconManager = BeaconManager.getInstanceForApplication(getApplicationContext());
-        BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
+        //BeaconManager.setBeaconSimulator(new TimedBeaconSimulator());
         beaconManager.getBeaconParsers().add(new BeaconParser().
                 setBeaconLayout(getString(R.string.ibeacon_layout)));
         beaconManager.bind(this);
@@ -94,6 +93,7 @@ public class BeaconService extends Service implements BeaconConsumer {
             public void didRangeBeaconsInRegion(final Collection<Beacon> beacons, Region region) {
                 if (beacons.size() > 0) {
                     //beacons.iterator().next().getDistance()
+                    //beaconManager.setBackgroundMode(true);
                     mBeacons.addAll(beacons);
                     Intent msgIntent = new Intent(BeaconService.this, GcmIntentService.class);
                     msgIntent.setAction(Constants.ACTION_BEACON_DATA);
@@ -117,7 +117,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
         try {
             beaconManager.startRangingBeaconsInRegion(ALL_BEACONS_REGION);
-        } catch (RemoteException e) {
+        } catch (RemoteException ignored) {
         }
     }
 }
