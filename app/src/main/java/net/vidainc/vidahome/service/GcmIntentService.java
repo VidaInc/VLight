@@ -15,42 +15,26 @@
  */
 package net.vidainc.vidahome.service;
 
-import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.app.NotificationManager;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import net.vidainc.vidahome.Constants;
 import net.vidainc.vidahome.R;
-import net.vidainc.vidahome.models.BeaconData;
 import net.vidainc.vidahome.receivers.GcmBroadcastReceiver;
 
-import org.json.JSONException;
-
 import java.io.IOException;
-import java.util.UUID;
 
 import de.greenrobot.event.EventBus;
 
@@ -58,99 +42,17 @@ public class GcmIntentService extends IntentService {
 
     private NotificationManager mNotificationManager;
     private String mSenderId = null;
-    private BluetoothDevice myDevice;
-    private BluetoothGatt mBluetoothGatt;
-    public final static UUID BEACONSERVICEUUID = UUID
-            .fromString("0000fab0-0000-1000-8000-00805f9b34fb");
-    public final static UUID BEACONPROXIMITYUUID = UUID
-            .fromString("0000fab1-0000-1000-8000-00805f9b34fb");
-    public final static UUID BEACONMAJORUUID = UUID
-            .fromString("0000fab2-0000-1000-8000-00805f9b34fb");
-    BluetoothGattService RxService;
-    BluetoothGattCharacteristic RxChar;
+
+
+    Thread switchThread;
+    LightDevice light1;
+    LightDevice light2;
     boolean isOn;
 
     public GcmIntentService() {
         super("GcmIntentService");
     }
 
-    public boolean writeCharacteristic(byte[] value, UUID mService,
-                                       UUID mCharacteristic) {
-        if (RxService == null)
-            RxService = mBluetoothGatt.getService(mService);
-
-        if (RxService == null) {
-            return false;
-        }
-        if (RxChar == null)
-            RxChar = RxService.getCharacteristic(mCharacteristic);
-        if (RxChar == null) {
-            return false;
-        }
-        RxChar.setValue(value);
-        return mBluetoothGatt.writeCharacteristic(RxChar);
-    }
-
-    private BluetoothGattCallback myGattCallback = new BluetoothGattCallback() {
-
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                                            int newState) {
-            Log.i("TAG", "connect newState = " + newState);
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.i("TAG", "Attempting to start service discovery:"
-                        + mBluetoothGatt.discoverServices());
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.i("TAG", "Disconnected from GATT server.");
-            }
-            super.onConnectionStateChange(gatt, status, newState);
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            Log.i("TAG", "onServicesDiscovered status = " + status);
-            super.onServicesDiscovered(gatt, status);
-            if (isOn)
-                write(255);
-            else
-                write(0);
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(GcmIntentService.this,
-                            "DISCOVERED", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt,
-                                          BluetoothGattCharacteristic characteristic, int status) {
-            Log.i("TAG", "onCharacteristicWrite status = " + status);
-            super.onCharacteristicWrite(gatt, characteristic, status);
-        }
-
-    };
-
-    @SuppressLint("NewApi")
-    private BluetoothDevice deviceFromBeaconData(BeaconData beaconData) {
-        BluetoothManager bluetoothManager = (BluetoothManager) this
-                .getSystemService(BLUETOOTH_SERVICE);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-        return bluetoothAdapter.getRemoteDevice(beaconData.getBluetoothAddress());
-    }
-
-    private void write(int i) {
-        byte[] value = new byte[6];
-        value[0] = 'e';
-        value[1] = (byte) i;
-        value[2] = 1;
-        value[3] = 1;
-        value[4] = 1;
-        value[5] = (byte) (value[1] ^ value[2] ^ value[3] ^ value[4]);
-        writeCharacteristic(value, BEACONSERVICEUUID, BEACONPROXIMITYUUID);
-        // mService.writeRXCharacteristic(value);
-    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -200,22 +102,6 @@ public class GcmIntentService extends IntentService {
                     Log.d("BENCHMARK", "MESSAGE RECEIVED AT: " + System.nanoTime());
                     // Post notification of received message.
                     String msg = extras.getString("message");
-                    if (myDevice == null) {
-                        try {
-                            BeaconData beaconData = BeaconData.listFromJsonString(msg).get(0);
-                            myDevice = deviceFromBeaconData(beaconData);
-                            mBluetoothGatt = myDevice.connectGatt(this, true, myGattCallback);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(GcmIntentService.this,
-                                        "CREATED", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
                     if (TextUtils.isEmpty(msg)) {
                         msg = "empty message";
                     }
