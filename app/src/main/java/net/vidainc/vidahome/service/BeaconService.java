@@ -34,71 +34,71 @@ public class BeaconService extends Service implements BeaconConsumer {
     private volatile Handler mHandler;
     private boolean training = false;
     private volatile int pos;
-    private final double[] theta = {0.468911760641924,
-            0.0253078120412154,
-            0.0893917752371334,
-            -0.144413313214988,
-            -0.0647937182535065,
-            0.0166672988136377,
-            -0.158916230735999,
-            0.0765139534697612,
-            -0.0310143666764122,
-            -0.196266199948791,
-            -0.102170871269151,
-            -0.0235900565469994,
-            -0.131250152149365,
-            0.00302484126069016,
-            -0.0501178520084614,
-            -0.123589567678203,
-            0.0295083822669376,
-            0.0141588320049618,
-            -0.0326395525734895,
-            -0.0904913181092089,
-            -0.0659488637091351,
-            -0.0130114045348839,
-            -0.0686699595961154,
-            -0.0122750382184766,
-            -0.0382111186877080,
-            -0.0583701079797298,
-            -0.00178094874654884,
-            -0.00436703312571950,
-            -0.0254265496376209,
-            -0.0365269097638787,
-            0.00564448408152303,
-            0.0127058157436064,
-            0.00293755867972040,
-            -0.0111525202735888,
-            -0.0198673507798012,
-            0.0143437008874961,
-            0.0243121765173170,
-            -6.72291691879858e-05,
-            0.00482867401377030,
-            -0.00414311429811783,
-            -0.00158634390678137,
-            -0.000501822625538651,
-            0.00577989536469710,
-            -0.00306675407975270,
-            0.00430039044294505,
-            -0.00318927425194603,
-            0.00626781802006138,
-            0.00332802069364097,
-            -0.00123629805702700,
-            0.00607340730422167,
-            -0.00474634864829963,
-            0.00287181921942395,
-            0.00225467414815961,
-            0.000470624319979251,
-            -0.00312213113510719,
-            0.00386843126988525,
-            -0.199051257910636,
-            -0.230256142810304,
-            -0.230013897151313,
-            -0.00197787327367626,
-            -0.00237551740766969,
-            0.00128607159193201,
-            0.00125781079630418,
-            -0.00433988434283404,
-            -0.00185691699201435,
+    private final double[] theta = {0.103173769743789,
+            -0.101984273679479,
+            0.00396318221266563,
+            0.0432714631647556,
+            -0.125851049794661,
+            -0.0668147847642316,
+            -0.0644593363920503,
+            0.00302054391923662,
+            0.00981250523782724,
+            0.0253253890696688,
+            -0.0745305528872685,
+            -0.0618005169094821,
+            -0.0635700337573497,
+            -0.0205661413695518,
+            -0.0281109640367432,
+            -0.0312055472060439,
+            0.00546215799023319,
+            0.00722130706850736,
+            0.0120111530760539,
+            0.0163006823740879,
+            -0.0187975895861915,
+            -0.0367268452939406,
+            -0.0220586089328664,
+            -0.0164845725187462,
+            -0.0257285933035895,
+            -0.0213490382617184,
+            -0.000453603348008487,
+            -0.00213590236303126,
+            -0.00623439085090089,
+            -0.00945370950839737,
+            0.00203491896602619,
+            0.00332912949223779,
+            0.00496838411947537,
+            0.00819341160570178,
+            0.00589494037492344,
+            0.00417876479716244,
+            -0.00783244424884796,
+            0.00198020494019314,
+            0.00108687010944410,
+            -0.00748155290104922,
+            0.000177751590426689,
+            0.00366578704437762,
+            0.00259836893801316,
+            -0.00363045075660319,
+            -0.000373993096220321,
+            0.000132505318567856,
+            0.00657503202342426,
+            0.00860917412875260,
+            0.00618808464149139,
+            0.00303577873832059,
+            -0.00162070466789109,
+            -0.000723977571505028,
+            0.000156861876544903,
+            0.00109368280260619,
+            0.00263473152603647,
+            -0.00281407535121060,
+            -0.0480346434074234,
+            -0.0481469609742585,
+            -0.0481060117671548,
+            0.00107422215807663,
+            -0.00232894188813344,
+            -0.00117427818006760,
+            -0.000208869425892304,
+            0.000943323499752048,
+            0.000453596610008821,
             0,
             0,
             0,
@@ -118,7 +118,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                 setBeaconLayout(getString(R.string.ibeacon_layout)));
         beaconManager.bind(this);
         //beaconManager.setDebug(true);
-        beaconManager.setForegroundScanPeriod(5000);
+        beaconManager.setForegroundScanPeriod(2000);
         mHandler = new Handler();
         Intent regIntent = new Intent(this, GcmIntentService.class);
         regIntent.setAction(Constants.ACTION_REGISTER);
@@ -167,7 +167,7 @@ public class BeaconService extends Service implements BeaconConsumer {
 
             @Override
             public synchronized void didRangeBeaconsInRegion(final Collection<Beacon> beacons, Region region) {
-                if (beacons.size() > 0 && (!training || pos < 200)) {
+                if (beacons.size() > 0 && (!training || pos < 400)) {
                     //beacons.iterator().next().getDistance()
                     //beaconManager.setBackgroundMode(true);
                     final double[] values = training ? new double[13] : new double[12];
@@ -191,7 +191,7 @@ public class BeaconService extends Service implements BeaconConsumer {
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
-                        values[12] = pos++ < 100 ? 1 : 0;
+                        values[12] = pos++ < 200 ? 1 : 0;
                         saveTextFile(Arrays.toString(values) + "\n");
                     } else {
                         final double[] features = mapFeature(values);
@@ -264,12 +264,12 @@ public class BeaconService extends Service implements BeaconConsumer {
         return 1 / (1 + FastMath.exp(-z));
     }
 
-    public void saveTextFile(String content) {
+    public synchronized void saveTextFile(String content) {
 
         FileOutputStream fileOutputStream = null;
 
         try {
-            fileOutputStream = openFileOutput("BEACON_DATA", Context.MODE_APPEND);
+            fileOutputStream = openFileOutput("data.txt", Context.MODE_APPEND);
             byte[] bytes = content.getBytes();
             fileOutputStream.write(bytes);
         } catch (IOException e) {
