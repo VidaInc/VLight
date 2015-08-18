@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.jmatio.io.MatFileReader;
@@ -198,34 +199,38 @@ public class BeaconService extends Service implements BeaconConsumer {
     }
 
     private static int predict(double[] features) {
-        double[] actv1 = new double[features.length + 1];
-        double[] actv2 = new double[theta1.length + 1];
-        double[] sigmoid = new double[theta1.length];
-        double[] hyp = new double[NUM_OF_ROOMS];
-        actv1[0] = 1;
-        actv2[0] = 1;
-        System.arraycopy(features, 0, actv1, 1, features.length);
+        double[] firstActivation = new double[features.length + 1];
+        double[] secondActivation = new double[theta1.length + 1];
+        double[] secondActivationHypothesis = new double[theta1.length];
+        double[] finalHypothesis = new double[NUM_OF_ROOMS];
+        firstActivation[0] = 1;
+        secondActivation[0] = 1;
+        System.arraycopy(features, 0, firstActivation, 1, features.length);
         for (int i = 0; i < theta1.length; i++) {
             double z = 0;
             for (int j = 0; j < theta1[0].length; j++) {
-                z += theta1[i][j] * actv1[j];
+                z += theta1[i][j] * firstActivation[j];
             }
-            sigmoid[i] = sigmoid(z);
+            secondActivationHypothesis[i] = sigmoid(z);
         }
-        System.arraycopy(sigmoid, 0, actv2, 1, sigmoid.length);
+        System.arraycopy(secondActivationHypothesis, 0, secondActivation, 1,
+                secondActivationHypothesis.length);
         for (int i = 0; i < theta2.length; i++) {
             double z = 0;
             for (int j = 0; j < theta2[0].length; j++) {
-                z += theta2[i][j] * actv2[j];
+                z += theta2[i][j] * secondActivation[j];
             }
-            hyp[i] = sigmoid(z);
+            finalHypothesis[i] = sigmoid(z);
         }
         int max = 0;
-        for (int i = 0; i < hyp.length; i++) {
-            if (hyp[i] > hyp[max])
+        for (int i = 0; i < finalHypothesis.length; i++) {
+            if (finalHypothesis[i] > finalHypothesis[max])
                 max = i;
         }
-        return max + 1;
+        final int prediction = max + 1;
+        Log.d("CLASSIFIER CONFIDENCE", "Room : " + prediction + "\n " +
+                Arrays.toString(finalHypothesis));
+        return prediction;
     }
 
     private static double sigmoid(double z) {
