@@ -38,6 +38,7 @@ public class BeaconService extends Service implements BeaconConsumer {
     private static final int NUM_OF_ROOMS = 4;
     private static double[][] theta1;
     private static double[][] theta2;
+    private static double[][] theta3;
     private BeaconManager beaconManager;
     private volatile Handler mHandler;
     private boolean training = false;
@@ -56,6 +57,7 @@ public class BeaconService extends Service implements BeaconConsumer {
             matfilereader = new MatFileReader(thetas);
             theta1 = ((MLDouble) matfilereader.getMLArray("Theta1")).getArray();
             theta2 = ((MLDouble) matfilereader.getMLArray("Theta2")).getArray();
+            theta3 = ((MLDouble) matfilereader.getMLArray("Theta3")).getArray();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -201,10 +203,13 @@ public class BeaconService extends Service implements BeaconConsumer {
     private static int predict(double[] features) {
         double[] firstActivation = new double[features.length + 1];
         double[] secondActivation = new double[theta1.length + 1];
+        double[] thirdActivation = new double[theta2.length + 1];
         double[] secondActivationHypothesis = new double[theta1.length];
+        double[] thirdActivationHypothesis = new double[theta2.length];
         double[] finalHypothesis = new double[NUM_OF_ROOMS];
         firstActivation[0] = 1;
         secondActivation[0] = 1;
+        thirdActivation[0] = 1;
         System.arraycopy(features, 0, firstActivation, 1, features.length);
         for (int i = 0; i < theta1.length; i++) {
             double z = 0;
@@ -219,6 +224,15 @@ public class BeaconService extends Service implements BeaconConsumer {
             double z = 0;
             for (int j = 0; j < theta2[0].length; j++) {
                 z += theta2[i][j] * secondActivation[j];
+            }
+            thirdActivationHypothesis[i] = sigmoid(z);
+        }
+        System.arraycopy(thirdActivationHypothesis, 0, thirdActivation, 1,
+                thirdActivationHypothesis.length);
+        for (int i = 0; i < theta3.length; i++) {
+            double z = 0;
+            for (int j = 0; j < theta3[0].length; j++) {
+                z += theta3[i][j] * thirdActivation[j];
             }
             finalHypothesis[i] = sigmoid(z);
         }
