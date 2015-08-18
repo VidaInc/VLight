@@ -190,7 +190,7 @@ public class BeaconService extends Service implements BeaconConsumer {
             for (int j = 0; j <= i; j++) {
                 for (int k = 0; k <= j; k++) {
                     out[pos++] =
-                            Math.pow(x1, i - j) * Math.pow(x2, j - k) * Math.pow(x3, k);
+                            FastMath.pow(x1, i - j) * FastMath.pow(x2, j - k) * FastMath.pow(x3, k);
                 }
             }
         }
