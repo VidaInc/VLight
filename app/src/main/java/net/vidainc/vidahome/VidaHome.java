@@ -15,6 +15,7 @@ import org.altbeacon.beacon.startup.RegionBootstrap;
  * Created by Aaron on 10/07/2015.
  */
 public class VidaHome extends Application implements BootstrapNotifier {
+    public static boolean edited = false;
     private RegionBootstrap regionBootstrap;
     private BackgroundPowerSaver backgroundPowerSaver;
 

@@ -1,10 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Vida Inc</string>
 
-    <string name="app_name">Vida Light</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="UserSettingActivity">Setup View</string>
+
+    <string name="title_activity_entered_room">Entered Room</string>
+    <string name="title_activity_roomctivity">Room Activity</string>
+
     <string name="action_settings">Settings</string>
-    <string name="ok">OK</string>
+
+    <string name="pref_room">Choose the type of the room</string>
+    <string name="pref_beacon">Choose the beacons</string>
+    <string name="pref_room_summary">Set the sync frequency</string>
+    <string name="pref_user_name">Set username</string>
+    <string name="pref_user_name_summary">Set your username</string>
+
+    <string name="pref_user_profile">User Profile</string>
+    <string name="setup">Setup</string>
+    <string name="title_activity_fragment_two">FragmentTwo</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="content_authority">com.ruanlopes.vidainc</string>
+
     <string name="gcm_project_id">365734933247</string>
     <string name="ibeacon_layout">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
 

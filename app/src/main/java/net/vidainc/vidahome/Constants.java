@@ -17,6 +17,10 @@ public interface Constants {
 
     long GCM_DEFAULT_TTL = 2 * 24 * 60 * 60 * 1000; // two days
 
+    boolean valid = false;
+    int RESULT_SETTINGS = 1; // Tag for onActivityResult
+
+
 
     String SERVER_PACKAGE = "net.vidainc.home.server";
     // actions for server interaction

@@ -1,19 +1,23 @@
-<LinearLayout
-    android:id="@+id/root_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".frontend.activities.MainActivity"
-    tools:ignore="MergeRootFrame">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/background"
+             tools:context=".MainActivity">
 
-    <include
-        android:id="@+id/app_bar"
-        layout="@layout/toolbar"/>
-
-    <fragment
-        android:name="net.vidainc.vidahome.frontend.fragments.BeaconFragment"
+    <FrameLayout
+        android:id="@+id/fragment_place"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-</LinearLayout>
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:layout_margin="15dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/ic_action"
+        android:background="@drawable/circle"
+        android:id="@+id/imageButton"
+        android:layout_gravity="center_horizontal|bottom"/>
+
+
+</FrameLayout>

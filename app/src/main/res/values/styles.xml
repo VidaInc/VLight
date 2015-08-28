@@ -1,27 +1,9 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="Theme.Base" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/vidaPrimaryColor</item>
-        <item name="colorPrimaryDark">@color/vidaSecondaryColor</item>
-        <item name="colorAccent">@color/vidaBackgroundAccent</item>
-        <item name="android:windowBackground">@color/vidaBackgroundColor</item>
-    </style>
 
-    <style name="Theme.Vida" parent="Theme.Base"/>
-
-    <style name="ActionBarThemeOverlay">
-        <item name="colorControlHighlight">@color/vidaHighlightColor</item>
-        <item name="android:textColorPrimary">@color/vidaPrimaryTextColor</item>
-        <item name="android:actionMenuTextColor">@color/vidaPrimaryTextColor</item>
-        <item name="android:textColorSecondary">@color/vidaPrimaryTextColor</item>
-        <item name="android:background">@color/vidaPrimaryColor</item>
-    </style>
-
-    <style name="ActionBar.TitleText" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/vidaPrimaryTextColor</item>
-        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>
