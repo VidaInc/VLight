@@ -29,6 +29,8 @@ public class BeaconData {
     private Identifier mIdentifier1;
     private Identifier mIdentifier2;
     private Identifier mIdentifier3;
+    private Room mRoom;
+    private double mLastKnownDistance;
 
     public String getBluetoothAddress() {
         return mBluetoothAddress;
@@ -92,6 +94,22 @@ public class BeaconData {
 
     public void setIdentifier3(Identifier identifier3) {
         mIdentifier3 = identifier3;
+    }
+
+    public Room getRoom() {
+        return mRoom;
+    }
+
+    public void setRoom(Room mRoom) {
+        this.mRoom = mRoom;
+    }
+
+    public double getLastKnownDistance() {
+        return mLastKnownDistance;
+    }
+
+    public void setLastKnownDistance(double mLastKnownDistance) {
+        this.mLastKnownDistance = mLastKnownDistance;
     }
 
     public List<Identifier> getIdentifiers() {

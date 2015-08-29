@@ -6,10 +6,14 @@ import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.graphics.Point;
 import android.net.Uri;
 
+import net.vidainc.vidahome.models.BeaconData;
 import net.vidainc.vidahome.models.Room;
+
+import org.altbeacon.beacon.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +24,46 @@ import java.util.List;
 public class BeaconProvider extends ContentProvider {
 
     private static final int ROOMS = 100;
+    private static final int BEACONS = 200;
+    private static final int BEACONS_WITH_ROOM = 201;
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static final SQLiteQueryBuilder sBeaconsByRoomQueryBuilder;
     private static final String sRoomNameSelection =
             BeaconContract.RoomEntry.TABLE_NAME +
                     "." + BeaconContract.RoomEntry.COLUMN_ROOM_NAME + " = ? ";
-    public static final String[] ROOM_PROJECTION = new String[]{BeaconContract.RoomEntry.COLUMN_ROOM_NAME,
+    private static final String sBeaconNameSelection =
+            BeaconContract.BeaconEntry.TABLE_NAME +
+                    "." + BeaconContract.BeaconEntry.COLUMN_MAC_ADDRESS + " = ? ";
+    public static final String[] ROOM_PROJECTION = {
+            BeaconContract.RoomEntry.COLUMN_ROOM_NAME,
             BeaconContract.RoomEntry.COLUMN_ROOM_X,
             BeaconContract.RoomEntry.COLUMN_ROOM_Y,
-            BeaconContract.RoomEntry.COLUMN_ROOM_DRAWABLE_ID};
+            BeaconContract.RoomEntry.COLUMN_ROOM_DRAWABLE_ID
+    };
+    public static final String[] BEACON_PROJECTION = {
+            BeaconContract.BeaconEntry.COLUMN_MAC_ADDRESS,
+            BeaconContract.BeaconEntry.COLUMN_BLUETOOTH_NAME,
+            BeaconContract.BeaconEntry.COLUMN_LAST_KNOWN_DISTANCE,
+            BeaconContract.BeaconEntry.COLUMN_SERVICE_UUID,
+            BeaconContract.BeaconEntry.COLUMN_LAST_KNOWN_RSSI,
+            BeaconContract.BeaconEntry.COLUMN_PROXIMITY_UUID,
+            BeaconContract.BeaconEntry.COLUMN_MAJOR_UUID,
+            BeaconContract.BeaconEntry.COLUMN_MINOR_UUID,
+            BeaconContract.BeaconEntry.COLUMN_ROOM_KEY
+
+    };
+
+    static {
+        sBeaconsByRoomQueryBuilder = new SQLiteQueryBuilder();
+        sBeaconsByRoomQueryBuilder.setTables(
+                BeaconContract.BeaconEntry.TABLE_NAME + " INNER JOIN " +
+                        BeaconContract.RoomEntry.TABLE_NAME +
+                        " ON " + BeaconContract.BeaconEntry.TABLE_NAME +
+                        "." + BeaconContract.BeaconEntry.COLUMN_ROOM_KEY +
+                        " = " + BeaconContract.RoomEntry.TABLE_NAME +
+                        "." + BeaconContract.RoomEntry.COLUMN_ROOM_NAME);
+    }
 
     private BeaconDbHelper mOpenHelper;
 
@@ -44,6 +79,8 @@ public class BeaconProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, BeaconContract.PATH_ROOMS, ROOMS);
+        matcher.addURI(authority, BeaconContract.PATH_BEACONS, BEACONS);
+        matcher.addURI(authority, BeaconContract.PATH_BEACONS + "/*", BEACONS_WITH_ROOM);
         return matcher;
     }
 
@@ -67,8 +104,20 @@ public class BeaconProvider extends ContentProvider {
                         selectionArgs,
                         null,
                         null,
-                        sortOrder
-                );
+                        sortOrder);
+                break;
+            case BEACONS:
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        BeaconContract.BeaconEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case BEACONS_WITH_ROOM:
+                retCursor = getBeaconsByRoom(uri, projection, sortOrder);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -85,6 +134,8 @@ public class BeaconProvider extends ContentProvider {
         switch (match) {
             case ROOMS:
                 return BeaconContract.RoomEntry.CONTENT_TYPE;
+            case BEACONS:
+                return BeaconContract.BeaconEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -100,7 +151,15 @@ public class BeaconProvider extends ContentProvider {
             case ROOMS: {
                 long _id = db.insert(BeaconContract.RoomEntry.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = BeaconContract.RoomEntry.buildAccountsUri(_id);
+                    returnUri = BeaconContract.RoomEntry.buildRoomUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case BEACONS: {
+                long _id = db.insert(BeaconContract.BeaconEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = BeaconContract.BeaconEntry.buildBeaconUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -122,6 +181,10 @@ public class BeaconProvider extends ContentProvider {
                 rowsDeleted = db.delete(
                         BeaconContract.RoomEntry.TABLE_NAME, selection, selectionArgs);
                 break;
+            case BEACONS:
+                rowsDeleted = db.delete(
+                        BeaconContract.BeaconEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -142,6 +205,10 @@ public class BeaconProvider extends ContentProvider {
                 rowsUpgraded = db.update(
                         BeaconContract.RoomEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
+            case BEACONS:
+                rowsUpgraded = db.update(
+                        BeaconContract.BeaconEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -150,6 +217,18 @@ public class BeaconProvider extends ContentProvider {
         }
         return rowsUpgraded;
     }
+
+    private Cursor getBeaconsByRoom(Uri uri, String[] projection, String sortOrder) {
+        return sBeaconsByRoomQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sRoomNameSelection,
+                new String[]{BeaconContract.BeaconEntry.getRoomNameFromUri(uri)},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
 
     public static synchronized Uri insertRoom(Context context, Room room) {
 
@@ -194,5 +273,76 @@ public class BeaconProvider extends ContentProvider {
         }
         cursor.close();
         return rooms;
+    }
+
+    public static synchronized BeaconData getBeacon(Context context, String macAddress) {
+        Cursor cursor = context.getContentResolver().query(BeaconContract.BeaconEntry.CONTENT_URI,
+                BEACON_PROJECTION, sBeaconNameSelection, new String[]{macAddress}, null);
+
+        if (!cursor.moveToFirst()) throw new IllegalArgumentException("Beacon not found");
+
+        BeaconData beaconData = new BeaconData();
+        beaconData.setBluetoothAddress(cursor.getString(0));
+        beaconData.setBluetoothName(cursor.getString(1));
+        beaconData.setLastKnownDistance(cursor.getDouble(2));
+        beaconData.setServiceUuid(cursor.getInt(3));
+        beaconData.setRssi(cursor.getInt(4));
+        beaconData.setIdentifier1(Identifier.fromInt(cursor.getInt(5)));
+        beaconData.setIdentifier2(Identifier.fromInt(cursor.getInt(6)));
+        beaconData.setIdentifier3(Identifier.fromInt(cursor.getInt(7)));
+        beaconData.setRoom(getRoom(context, cursor.getString(8)));
+        cursor.close();
+
+        return beaconData;
+    }
+
+    public static synchronized List<BeaconData> getAllBeacons(Context context) {
+        ArrayList<BeaconData> beaconDataList = new ArrayList<>();
+        Cursor cursor = context.getContentResolver().query(BeaconContract.BeaconEntry.CONTENT_URI,
+                BEACON_PROJECTION, null,
+                null, null);
+        //if (!cursor.moveToFirst()) throw new IllegalArgumentException("Room not found");
+
+        while (cursor.moveToNext()) {
+            BeaconData beaconData = new BeaconData();
+            beaconData.setBluetoothAddress(cursor.getString(0));
+            beaconData.setBluetoothName(cursor.getString(1));
+            beaconData.setLastKnownDistance(cursor.getDouble(2));
+            beaconData.setServiceUuid(cursor.getInt(3));
+            beaconData.setRssi(cursor.getInt(4));
+            beaconData.setIdentifier1(Identifier.fromInt(cursor.getInt(5)));
+            beaconData.setIdentifier2(Identifier.fromInt(cursor.getInt(6)));
+            beaconData.setIdentifier3(Identifier.fromInt(cursor.getInt(7)));
+            beaconData.setRoom(getRoom(context, cursor.getString(8)));
+            beaconDataList.add(beaconData);
+        }
+        cursor.close();
+        return beaconDataList;
+    }
+
+    public static synchronized List<BeaconData> getAllBeaconsInRoom(Context context, String roomName) {
+        ArrayList<BeaconData> beaconDataList = new ArrayList<>();
+        Cursor cursor = context.getContentResolver().query(BeaconContract.BeaconEntry
+                        .buildBeaconUriWithRoom(roomName),
+                BEACON_PROJECTION, null,
+                null, null);
+        //if (!cursor.moveToFirst()) throw new IllegalArgumentException("Room not found");
+        Room room = getRoom(context, roomName);
+
+        while (cursor.moveToNext()) {
+            BeaconData beaconData = new BeaconData();
+            beaconData.setBluetoothAddress(cursor.getString(0));
+            beaconData.setBluetoothName(cursor.getString(1));
+            beaconData.setLastKnownDistance(cursor.getDouble(2));
+            beaconData.setServiceUuid(cursor.getInt(3));
+            beaconData.setRssi(cursor.getInt(4));
+            beaconData.setIdentifier1(Identifier.fromInt(cursor.getInt(5)));
+            beaconData.setIdentifier2(Identifier.fromInt(cursor.getInt(6)));
+            beaconData.setIdentifier3(Identifier.fromInt(cursor.getInt(7)));
+            beaconData.setRoom(room);
+            beaconDataList.add(beaconData);
+        }
+        cursor.close();
+        return beaconDataList;
     }
 }

@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -16,6 +17,7 @@ import net.vidainc.vidahome.R;
 import net.vidainc.vidahome.VidaHome;
 import net.vidainc.vidahome.frontend.fragments.FragmentOne;
 import net.vidainc.vidahome.frontend.fragments.FragmentTwo;
+import net.vidainc.vidahome.service.BeaconService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        startService(new Intent(this, BeaconService.class));
 
         FAB = (ImageButton) findViewById(R.id.imageButton);
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (VidaHome.edited){
+        if (VidaHome.edited || true){
 
 
             fr = new FragmentOne();

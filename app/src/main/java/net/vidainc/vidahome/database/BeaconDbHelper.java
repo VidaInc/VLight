@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import static net.vidainc.vidahome.database.BeaconContract.RoomEntry;
+import static net.vidainc.vidahome.database.BeaconContract.BeaconEntry;
 
 
 /**
@@ -23,7 +24,7 @@ public class BeaconDbHelper extends SQLiteOpenHelper {
     @Override
     public void onConfigure(SQLiteDatabase db) {
         super.onConfigure(db);
-        //db.setForeignKeyConstraintsEnabled(true);
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     @Override
@@ -40,12 +41,34 @@ public class BeaconDbHelper extends SQLiteOpenHelper {
                 // it's created a UNIQUE constraint with REPLACE strategy
                 "UNIQUE (" + RoomEntry.COLUMN_ROOM_NAME + ") ON CONFLICT REPLACE);";
 
+        final String SQL_CREATE_BEACON_TABLE = "CREATE TABLE " + BeaconEntry.TABLE_NAME +
+                " (" + BeaconEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                BeaconEntry.COLUMN_MAC_ADDRESS + " TEXT NOT NULL, " +
+                BeaconEntry.COLUMN_BLUETOOTH_NAME + " TEXT," +
+                BeaconEntry.COLUMN_LAST_KNOWN_DISTANCE + " REAL," +
+                BeaconEntry.COLUMN_LAST_KNOWN_RSSI + " INTEGER," +
+                BeaconEntry.COLUMN_SERVICE_UUID + " INTEGER," +
+                BeaconEntry.COLUMN_PROXIMITY_UUID + " INTEGER," +
+                BeaconEntry.COLUMN_MAJOR_UUID + " INTEGER," +
+                BeaconEntry.COLUMN_MINOR_UUID + " INTEGER," +
+                BeaconEntry.COLUMN_ROOM_KEY + " TEXT," +
+
+                " FOREIGN KEY (" + BeaconEntry.COLUMN_ROOM_KEY + ") REFERENCES " +
+                RoomEntry.TABLE_NAME + " (" + RoomEntry.COLUMN_ROOM_NAME + ") " +
+                RoomEntry.TABLE_NAME + " (" + RoomEntry.COLUMN_ROOM_NAME + ") " +
+                "ON UPDATE CASCADE ON DELETE CASCADE, " +
+                "UNIQUE (" + BeaconEntry.COLUMN_MAC_ADDRESS + ") ON CONFLICT IGNORE);";
+
+
         sqLiteDatabase.execSQL(SQL_CREATE_ROOM_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_BEACON_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + RoomEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + BeaconEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
