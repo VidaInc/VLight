@@ -18,13 +18,13 @@ import android.widget.RelativeLayout;
 import net.vidainc.vidahome.R;
 import net.vidainc.vidahome.VidaHome;
 import net.vidainc.vidahome.database.BeaconProvider;
-import net.vidainc.vidahome.frontend.activities.EnteredRoom;
+import net.vidainc.vidahome.frontend.activities.RoomMapActivity;
 import net.vidainc.vidahome.models.Room;
 
 import java.util.List;
 
-public class FragmentTwo extends Fragment {
-
+public class MapDisplayFragment extends Fragment {
+//TODO: point the edit button to fragment one. Fragment one needs handling too
 
 
     View rootView;
@@ -49,6 +49,9 @@ public class FragmentTwo extends Fragment {
 
         editButton = (ImageButton) rootView.findViewById(R.id.editButton);
 
+
+
+        //TODO rigorous way to go into fragment one. need constructor in fragment one from fragment two
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,7 +112,6 @@ public class FragmentTwo extends Fragment {
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-
             int action = event.getAction();
             int x = (int) event.getX();
             int y = (int) event.getY();
@@ -125,14 +127,16 @@ public class FragmentTwo extends Fragment {
                         mTouchedRoom.setSelected(true);
 
 
-                        Intent intent = new Intent(contextDrag, EnteredRoom.class);
+                        Intent intent = new Intent(contextDrag, RoomMapActivity.class);
 
                         // TODO: CHECK CONECTIVITY BETWEEN THIS CALL AND THE DATABASE
-                        intent.putExtra("ID_OBJ", mTouchedRoom.getId());
+                        intent.putExtra("name_room", mTouchedRoom.getName());
                         startActivity(intent);
                     }
 
                     break;
+                //case MotionEvent.Action_
+                //TODO on longClick: new intent(enteredroom). on touch: turn on and off using controlling methods
             }
 
             invalidate();

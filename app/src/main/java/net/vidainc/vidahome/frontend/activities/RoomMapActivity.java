@@ -7,14 +7,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import net.vidainc.vidahome.R;
+import  net.vidainc.vidahome.R;
+import net.vidainc.vidahome.database.BeaconProvider;
 
-public class EnteredRoom extends AppCompatActivity {
 
+/*
+The rooms where devices are displayed and controlled
+ */
+public class RoomMapActivity extends AppCompatActivity {
+
+    TextView typeBtn;
     ImageView CenterButton;
     ImageView beaconTop;
+
+    String nameRoom;
 
     /**
      * Button from the Botton Nav
@@ -39,11 +48,18 @@ public class EnteredRoom extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_entered_room);
+        setContentView(R.layout.activity_room_map);
+
+        typeBtn = (TextView) findViewById(R.id.roomType);
 
         //TODO: GET ID SENT FROM FRAGMENT TWO TO USE TO RETRIEVE THE PROPERLY DATA FROM THE BEACON DB
         Intent intent = getIntent();
-        long id = intent.getLongExtra("ID_OBJ", -1);
+        nameRoom = intent.getStringExtra("name_room");
+
+        //TODO: GET from the database room name
+        typeBtn.setText(BeaconProvider.getRoom(this, nameRoom).getName());
+
+
 
 
         /**
@@ -56,7 +72,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 bntSelection(true, false, false, false, false);
-                Toast.makeText(EnteredRoom.this, "Clicked 1", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Clicked 1", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -67,7 +83,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 bntSelection(false,true,false,false,false);
-                Toast.makeText(EnteredRoom.this, "Clicked 2", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Clicked 2", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -78,7 +94,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 bntSelection(false,false,true,false,false);
-                Toast.makeText(EnteredRoom.this, "Clicked 3", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Clicked 3", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -89,7 +105,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 bntSelection(false,false,false,true,false);
-                Toast.makeText(EnteredRoom.this, "Clicked 4", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Clicked 4", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -100,7 +116,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 bntSelection(false,false,false,false,true);
-                Toast.makeText(EnteredRoom.this, "Clicked 5", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Clicked 5", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -115,8 +131,8 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 beaconSelection(true, false, false);
-                Toast.makeText(EnteredRoom.this, "Beacon Clicked 1", Toast.LENGTH_LONG).show();
-
+                Toast.makeText(RoomMapActivity.this, "Beacon Clicked 1", Toast.LENGTH_LONG).show();
+//TODO add control functions
             }
         });
 
@@ -126,7 +142,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 beaconSelection(false, true ,false);
-                Toast.makeText(EnteredRoom.this, "Beacon Clicked 2", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Beacon Clicked 2", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -137,7 +153,7 @@ public class EnteredRoom extends AppCompatActivity {
             public void onClick(View v) {
 
                 beaconSelection(false,false,true);
-                Toast.makeText(EnteredRoom.this, "Beacon Clicked 3", Toast.LENGTH_LONG).show();
+                Toast.makeText(RoomMapActivity.this, "Beacon Clicked 3", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -168,7 +184,7 @@ public class EnteredRoom extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_entered_room, menu);
+        getMenuInflater().inflate(R.menu.menu_room_map, menu);
         return true;
     }
 

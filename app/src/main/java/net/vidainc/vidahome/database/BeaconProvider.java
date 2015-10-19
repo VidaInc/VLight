@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.graphics.Point;
@@ -238,7 +239,14 @@ public class BeaconProvider extends ContentProvider {
         contentValues.put(BeaconContract.RoomEntry.COLUMN_ROOM_Y, room.getTop());
         contentValues.put(BeaconContract.RoomEntry.COLUMN_ROOM_DRAWABLE_ID, room.getDrawable());
 
-        return context.getContentResolver().insert(BeaconContract.RoomEntry.CONTENT_URI, contentValues);
+        try {
+            return context.getContentResolver().insert(BeaconContract.RoomEntry.CONTENT_URI, contentValues);
+        } catch (SQLException e) {
+            context.getContentResolver().update(BeaconContract.RoomEntry.CONTENT_URI,
+                    contentValues, BeaconContract.RoomEntry.COLUMN_ROOM_NAME + " =? " +
+                            room.getName(), null);
+            return BeaconContract.RoomEntry.CONTENT_URI;
+        }
     }
 
     public static synchronized Room getRoom(Context context, String name) {

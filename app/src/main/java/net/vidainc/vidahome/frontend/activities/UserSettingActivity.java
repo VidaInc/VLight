@@ -2,7 +2,6 @@ package net.vidainc.vidahome.frontend.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.View;
@@ -13,9 +12,6 @@ import net.vidainc.vidahome.R;
 public class UserSettingActivity extends PreferenceActivity {
 
 	int tagCircle;
-
-	// TODO: Create database
-	private SQLiteDatabase myDB;
 
 	Button mBackBtn;
 	Button mTrainBtn;
@@ -79,8 +75,8 @@ public class UserSettingActivity extends PreferenceActivity {
 			@Override
 			public void onClick(View v) {
 
-				//Intent intent = new Intent(new Intent(UserSettingActivity.this, TrainingActivity.class));
-				//startActivity(intent);
+				Intent intent = new Intent(new Intent(UserSettingActivity.this, TrainingActivity.class));
+				startActivity(intent);
 			}
 		});
 	}

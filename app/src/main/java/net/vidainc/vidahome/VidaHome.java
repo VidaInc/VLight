@@ -18,6 +18,9 @@ public class VidaHome extends Application implements BootstrapNotifier {
     public static boolean edited = false;
     private RegionBootstrap regionBootstrap;
     private BackgroundPowerSaver backgroundPowerSaver;
+    public static final int RESULT_SETTINGS = 1; // Tag for onActivityResult
+    public static boolean isLoggedIn = true;
+
 
     @Override
     public void onCreate() {

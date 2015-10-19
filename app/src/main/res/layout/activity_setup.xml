@@ -1,0 +1,26 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/background"
+             tools:context=".SetupActivity">
+
+    <FrameLayout
+        android:id="@+id/floor_setup_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageButton
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/ic_action"
+        android:background="@drawable/seekbar_button"
+        android:id="@+id/imageButton"
+        android:layout_gravity="left|bottom|center_horizontal"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="50dp"
+        android:text="@string/done"
+        android:clickable="true" />
+
+
+</FrameLayout>

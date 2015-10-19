@@ -18,10 +18,21 @@
     <string name="setup">Setup</string>
     <string name="title_activity_fragment_two">FragmentTwo</string>
 
+    <string name="done">Done</string>
+
     <string name="hello_world">Hello world!</string>
-    <string name="content_authority">com.ruanlopes.vidainc</string>
+    <string name="title_activity_training">TrainingActivity</string>
+    <string name="title_activity_starting">StartingActivity</string>
+    <string name="title_activity_floor_map">FloorMapActivity</string>
+    <string name="title_fragment_floor_map">FloorMapFragment</string>
+    <string name="content_authority">net.vidainc.vidahome</string>
 
     <string name="gcm_project_id">365734933247</string>
     <string name="ibeacon_layout">m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+    completions."</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

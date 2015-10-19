@@ -10,6 +10,14 @@ public interface Constants {
     String KEY_ACCOUNT = "keyAccount";
     String KEY_MESSAGE_TXT = "keyMessageTxt";
     String KEY_EVENT_TYPE = "keyEventbusType";
+    String KEY_BEACON_SERVICE_ROOM_NUMBER = "beacon_service_room_number";
+    String KEY_BEACON_SERVICE_ROOM_CERTAINTY = "beacon_service_room_certainty";
+
+    int BEACON_SERVICE_TRAIN_EVENT = 0;
+
+    String BEACON_MAC_ONE = "B4:99:4C:89:70:53";
+    String BEACON_MAC_TWO = "D0:FF:50:67:7C:4A";
+    String BEACON_MAC_THREE = "B4:99:4C:89:72:9E";
 
     String ACTION = "action";
     // very simply notification handling :-)

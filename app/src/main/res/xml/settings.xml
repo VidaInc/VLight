@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/setup" >
+
+        <EditTextPreference
+            android:key="room_name"
+            android:summary="Set Room Name"
+            android:title="Room Name"
+                            />
+
+        <ListPreference
+            android:key="prefRoom"
+            android:entries="@array/roomImgs"
+            android:summary="@string/pref_room_summary"
+            android:entryValues="@array/roomImgsValues"
+            android:title="@string/pref_room" />
+
+        <MultiSelectListPreference
+            android:key="prefBeacon"
+            android:entries="@array/beaconsArray"
+            android:summary="@string/pref_room_summary"
+            android:entryValues="@array/beaconsArrayValues"
+            android:title="@string/pref_beacon" />
+
+        <ListPreference
+            android:key="default_category"
+            android:title="Dynamic categories" android:summary="Dynamic categories summary"
+            android:defaultValue="0" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

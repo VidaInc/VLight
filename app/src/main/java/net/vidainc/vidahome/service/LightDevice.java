@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
+import android.os.Looper;
 import android.util.Log;
 
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class LightDevice {
     private BluetoothGattCharacteristic mRxChar;
     private int mState;
     private int mStatus;
+    private byte lightValue;
 
     public LightDevice(Context context, final OnLightDeviceConnectedListener
             onLightDeviceConnectedListener, String macAddress) {
@@ -43,6 +45,7 @@ public class LightDevice {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     Log.i("TAG", "Attempting to start service discovery:"
                             + mBluetoothGatt.discoverServices());
+                    onLightDeviceConnectedListener.onConnected();
                 } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                     Log.i("TAG", "Disconnected from GATT server.");
                 }
@@ -56,7 +59,6 @@ public class LightDevice {
                 Log.i("TAG", "onServicesDiscovered status = " + status);
                 super.onServicesDiscovered(gatt, status);
                 mStatus = status;
-                onLightDeviceConnectedListener.onConnected();
             }
 
             @Override
@@ -84,6 +86,10 @@ public class LightDevice {
     }
 
     public boolean writeToLight(byte b) {
+        //stop scanning
+        lightValue = b;
+        if(Looper.myLooper() == Looper.getMainLooper())
+            throw new IllegalThreadStateException("Cannot call from main thread!");
         if (mStatus != BluetoothGatt.GATT_SUCCESS)
             throw new IllegalStateException("Not connected");
         byte[] value = new byte[6];
@@ -105,9 +111,19 @@ public class LightDevice {
             return false;
 
         mRxChar.setValue(value);
-        return mBluetoothGatt.writeCharacteristic(mRxChar);
-    }
+        long startTime = System.nanoTime();
+        boolean succeeded;
+        do{
+            succeeded = mBluetoothGatt.writeCharacteristic(mRxChar);
+        }while (!succeeded && System.nanoTime() - startTime < 5000000000L);
 
+
+        // resume scanning
+        return succeeded;
+    }
+public byte getLightValue(){
+    return lightValue;
+}
     public interface OnLightDeviceConnectedListener {
         void onConnected();
     }

@@ -21,7 +21,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.vidainc.vidahome.Constants;
 import net.vidainc.vidahome.R;
 import net.vidainc.vidahome.VidaHome;
 import net.vidainc.vidahome.database.BeaconProvider;
@@ -30,11 +29,12 @@ import net.vidainc.vidahome.models.Room;
 
 import java.util.ArrayList;
 
+
 /**
  * A placeholder fragment containing a simple view.
  */
 
-public class FragmentOne extends Fragment{
+public class MapSetupFragment extends Fragment{
 
     private View rootView;
     private RelativeLayout mRelativeLayout;
@@ -45,7 +45,7 @@ public class FragmentOne extends Fragment{
     ImageButton addButton;
     TextView guideTxt;
 
-    public FragmentOne() {
+    public MapSetupFragment() {
     }
 
     @Override
@@ -183,7 +183,7 @@ public class FragmentOne extends Fragment{
 
                     Intent intent = new Intent(contextDrag, UserSettingActivity.class);
                     intent.putExtra("tagCircle", mRoomList.indexOf(mTouchedRoom));
-                    FragmentOne.this.startActivityForResult(intent, Constants.RESULT_SETTINGS);
+                    MapSetupFragment.this.startActivityForResult(intent, VidaHome.RESULT_SETTINGS);
 
                     break;
 
@@ -195,7 +195,7 @@ public class FragmentOne extends Fragment{
         }
 
         public Room didTouchCircle(int x, int y){
-
+// to recognize which circle is it from the array.
             //First Width
             for (Room room : mRoomList) {
 
@@ -229,18 +229,24 @@ public class FragmentOne extends Fragment{
          */
 
         public void updateCircle(int tag) {
-
+//TODO: put training activity in
 
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(contextDrag);
 
             String uri = sharedPrefs.getString("prefRoom", "NULL");
+            String roomName = sharedPrefs.getString("room_name", "NULL");
+
+            mRoomList.get(tag).setName(roomName);
 
             int imageResource = contextDrag.getResources().getIdentifier(uri, "drawable", contextDrag.getPackageName());
+            mRoomList.get(tag).setDrawable(imageResource);
+
             Bitmap newImage = BitmapFactory.decodeResource(contextDrag.getResources(), imageResource);
 
             mRoomList.get(tag).setImage(newImage);
 
-            BeaconProvider.insertRoom(getActivity(), mRoomList.get(tag));
+
+            BeaconProvider.insertRoom(getActivity(), mRoomList.get(tag));  //inserting room to database
 
             invalidate();
 
